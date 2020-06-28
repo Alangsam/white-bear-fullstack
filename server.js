@@ -10,13 +10,12 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
-connection.query("SELECT 1 + 1 AS solution", (error, results, fields) => {
-   if (error) {
-      console.log(error);
+connection.query(`SELECT * FROM users`, (err, res, fields) => {
+   if (err) {
+      console.log(err);
    } else {
-      console.log("The solution is: ", results[0].solution);
+      console.log(res);
    }
 });
 
 connection.end();
-//sss
