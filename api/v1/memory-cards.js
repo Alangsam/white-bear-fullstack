@@ -8,15 +8,11 @@ const { toJson, toSafeParse } = require("../../utils/helpers");
 //@desc         GET all memory cards for a user by search term and order
 //@access       Public
 router.get("/", (req, res) => {
-   db.query(
-      selectAllCards(
-         "42160c3e-7a5b-4fb9-b361-ac9598aca4e2",
-         "ash",
-         "memory_cards.created_at DESC"
-      )
-   )
+   console.log(req.query);
+   const { userId, searchTerm, order } = req.query;
+   db.query(selectAllCards(userId, searchTerm, order))
       .then((dbRes) => {
-         console.log(dbRes);
+         //console.log(dbRes);
          res.json(dbRes);
       })
       .catch((err) => {
