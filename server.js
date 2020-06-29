@@ -10,12 +10,15 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
-connection.query(`SELECT * FROM users`, (err, res, fields) => {
-   if (err) {
-      console.log(err);
-   } else {
-      console.log(res);
+connection.query(
+   selectUser("blah@email.com", "replace_me"),
+   (err, res, fields) => {
+      if (err) {
+         console.log(err);
+      } else {
+         console.log(res);
+      }
    }
-});
+);
 
 connection.end();
