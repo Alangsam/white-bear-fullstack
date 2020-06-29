@@ -1,5 +1,6 @@
 require("dotenv").config();
 const mysql = require("mysql");
+const selectUser = require("./queries/selectUser");
 
 const connection = mysql.createConnection({
    host: process.env.RDS_HOST,
