@@ -20,7 +20,9 @@ class AllCards extends React.Component {
 
    componentDidMount() {
       axios
-         .get("http://run.mocky.io/v3/f9dd6eab-752c-4e74-8662-121b9300af15")
+         .get(
+            "/api/v1/memory-cards?userId=42160c3e-7a5b-4fb9-b361-ac9598aca4e2&searchTerm=ash&order=memory_cards.created_at%20DESC"
+         )
          .then((res) => {
             // handle success
             console.log(res);
