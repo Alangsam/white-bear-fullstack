@@ -1,0 +1,16 @@
+//required bootsrap stuff
+
+@import "./bootstrap/functions";
+@import "./bootstrap/variables";
+@import "./bootstrap/mixins";
+
+@import url("https://fonts.googleapis.com/css?family=Fira+Sans:500|Noto+Sans:400,700|Noto+Serif&display=swap");
+
+//theme
+@import "./theme.scss";
+
+//bootstrap
+@import "./bootstrap/bootstrap.scss";
+
+//our overrides
+@import "./style.scss";

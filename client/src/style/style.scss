@@ -1,0 +1,76 @@
+.btn-link {
+   padding-left: 0;
+   padding-right: 0;
+   border: 0;
+}
+//.btn {
+//font-weight:  $font-weight-normal !important;
+//}
+
+.background-image {
+   background-image: url("../img/background-landing.jpg");
+   background-size: 100% 100%;
+   background-repeat: no-repeat;
+   background-attachment: fixed;
+   min-height: 100vh;
+}
+body,
+html {
+   height: 100%;
+   margin: 0;
+}
+
+#sort,
+#searchbox {
+   width: 200px;
+   height: 32px;
+}
+
+textarea {
+   resize: none;
+   color: $white;
+   outline: none;
+   font-size: $font-size-base * 1.25;
+}
+
+.text-brand {
+   font-family: $font-family-brand;
+}
+
+.tab-seperator {
+   border-left: 1px $gray-800 solid;
+}
+
+.card-body {
+   font-family: $font-family-serif;
+}
+.card.bg-primary {
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
+}
+
+.card.bg-secondary {
+   border-top-left-radius: 0;
+   border-top-right-radius: 0;
+}
+.card {
+   border: 0;
+}
+
+textarea {
+   background-color: transparent;
+   border: 0;
+}
+
+#the-top-card {
+   display: none;
+}
+
+.tab-active {
+   background-color: $gray-700;
+}
+
+.disabled {
+   pointer-events: fill;
+   cursor: not-allowed;
+}
