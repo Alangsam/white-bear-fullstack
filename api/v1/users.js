@@ -25,17 +25,19 @@ router.get("/", (req, res) => {
 //@desc         Create a new user
 //@access       Public
 router.post("/", async (req, res) => {
-   const hashedPassword = await toHash(req.body.password);
    const user = {
       id: req.body.id,
       email: req.body.email,
-      password: hashedPassword,
+      password: await toHash(req.body.password),
       created_at: req.body.createdAt,
    };
-   console.log(user);
    db.query(insertUser, user)
-      .then(() => {})
-      .catch(() => {});
+      .then((result) => {
+         console.log(result);
+      })
+      .catch((err) => {
+         console.log(err);
+      });
 });
 
 module.exports = router;
