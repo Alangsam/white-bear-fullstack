@@ -1,6 +1,5 @@
 import React from "react";
 import classnames from "classnames";
-import hash from "object-hash";
 import { v4 as getUuid } from "uuid";
 import { EMAIL_REGEX } from "../../utils/helpers";
 import axios from "axios";
@@ -120,11 +119,19 @@ class SignUp extends React.Component {
          const user = {
             id: getUuid(),
             email: inputedEmail,
-            password: hash(inputedPassword),
+            password: inputedPassword,
             createdAt: Date.now(),
          };
-         this.logInCurrentUser();
-         this.props.history.push("/create-answer");
+         axios
+            .post("/api/v1/users", user)
+            .then((res) => {
+               console.log(res);
+            })
+            .catch((err) => {
+               console.log(err);
+            });
+         //this.logInCurrentUser();
+         //this.props.history.push("/create-answer");
       }
    }
 
@@ -193,6 +200,10 @@ class SignUp extends React.Component {
                         <div className="form-group">
                            <label htmlFor="Email_password">
                               Create a password
+                              <br />
+                              <span className="text-muted">
+                                 Must be at least 9 characters
+                              </span>
                            </label>
 
                            <input
