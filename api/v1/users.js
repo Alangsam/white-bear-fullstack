@@ -5,6 +5,7 @@ const insertUser = require("../../queries/insertUser");
 const getSignUpEmailError = require("../../validation/getSignUpEmailError");
 const getSignUpPasswordError = require("../../validation/getSignUpPasswordError");
 const { toHash } = require("../../utils/helpers");
+const selectUserById = require("../../queries/selectUserById");
 
 //@route        POST api/v1/users
 //@desc         Create a new user
@@ -13,6 +14,7 @@ router.post("/", async (req, res) => {
    const { id, email, password, createdAt } = req.body;
    const emailError = await getSignUpEmailError(email);
    const passwordError = await getSignUpPasswordError(password, email);
+   let dbError = "";
    if (emailError === "" && passwordError === "") {
       const user = {
          id,
@@ -21,12 +23,26 @@ router.post("/", async (req, res) => {
          created_at: createdAt,
       };
       db.query(insertUser, user)
-         .then((result) => {
-            console.log(result);
+         .then(() => {
+            db.query(selectUserById, id)
+               .then((users) => {
+                  const user = users[0];
+                  res.status(200).json({
+                     id: user.id,
+                     email: user.email,
+                     createdAt: user.created_at,
+                  });
+               })
+               .catch((err) => {
+                  console.log(err);
+                  dbError = `${err.code} ${err.sqlMessage}`;
+                  res.status(400).json({ dbError });
+               });
          })
          .catch((err) => {
             console.log(err);
-            res.status(400).json({ emailError, passwordError });
+            dbError = `${err.code} ${err.sqlMessage}`;
+            res.status(400).json({ dbError });
          });
    } else {
       res.status(400).json({ emailError, passwordError });

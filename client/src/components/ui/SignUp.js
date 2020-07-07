@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { v4 as getUuid } from "uuid";
-import { EMAIL_REGEX } from "../../utils/helpers";
 import axios from "axios";
 import { connect } from "react-redux";
 import actions from "../../store/actions";
@@ -19,120 +18,58 @@ class SignUp extends React.Component {
       };
    }
 
-   logInCurrentUser() {
-      axios
-         .get(
-            "https://raw.githubusercontent.com/Alangsam/white-bear-mpa/master/src/mock-data/user.json"
-         )
-         .then((res) => {
-            // handle success
-            //console.log(res.data);
-            const currentUser = res.data;
-            this.props.dispatch({
-               type: actions.UPDATE_CURRENT_USER,
-               payload: currentUser,
-            });
-         })
-         .catch((error) => {
-            // handle error
-            console.log(error);
-         });
-   }
-
    makeCreateCardVisible = () => {
       this.setState({ createCardVisible: true });
    };
 
-   async setEmailState(emailInput) {
-      if (emailInput === "") {
-         this.setState({
-            createEmailError: "Please enter your email",
-            creatEmailHasError: true,
-         });
-      } else if (
-         emailInput !== "" &&
-         EMAIL_REGEX.test(String(emailInput).toLowerCase()) === false
-      ) {
-         this.setState({
-            createEmailError: "Please enter a valid email",
-            creatEmailHasError: true,
-         });
-      } else this.setState({ createEmailError: "", creatEmailHasError: false });
-   }
-
-   findNumberOfUniqueCharacters(str) {
-      const arrFromString = str.split("");
-      const arrOfUniqueCharacters = arrFromString.reduce((a, b) => {
-         if (a.indexOf(b) === -1) {
-            a.push(b);
-         }
-         return a;
-      }, []);
-
-      return arrOfUniqueCharacters;
-   }
-
-   async setPasswordState(passwordInput, emailInput) {
-      const indexOfAtSymbol = emailInput.indexOf("@");
-      const localPartEmail = emailInput.slice(0, indexOfAtSymbol);
-      const numOfUniqueCharactersPassword = this.findNumberOfUniqueCharacters(
-         passwordInput
-      );
-      if (passwordInput === "") {
-         this.setState({ createPasswordError: "Please enter Password" });
-         this.setState({ createPasswordHasError: true });
-      } else if (passwordInput.length < 9) {
-         this.setState({
-            createPasswordError: "Must have at least 9 characters",
-         });
-         this.setState({ createPasswordHasError: true });
-      } else if (
-         passwordInput.indexOf(localPartEmail) >= 0 &&
-         localPartEmail.length > 4
-      ) {
-         this.setState({
-            createPasswordError: "Password cannot contain email",
-         });
-         this.setState({ createPasswordHasError: true });
-      } else if (numOfUniqueCharactersPassword.length < 3) {
-         this.setState({
-            createPasswordError: "Must have at least 3 unique characters",
-         });
-         this.setState({ createPasswordHasError: true });
-      } else
-         this.setState({
-            createPasswordError: "",
-            createPasswordHasError: false,
-         });
-   }
-
    async validateAndCreateUser() {
       const inputedEmail = document.getElementById("Email_textbox").value;
       const inputedPassword = document.getElementById("Email_password").value;
-      await this.setEmailState(inputedEmail);
-      await this.setPasswordState(inputedPassword, inputedEmail);
-      if (
-         this.state.createPasswordHasError === false &&
-         this.state.creatEmailHasError === false
-      ) {
-         // eslint-disable-next-line
-         const user = {
-            id: getUuid(),
-            email: inputedEmail,
-            password: inputedPassword,
-            createdAt: Date.now(),
-         };
-         axios
-            .post("/api/v1/users", user)
-            .then((res) => {
-               console.log(res);
-            })
-            .catch((err) => {
-               console.log(err.response.data);
+
+      // eslint-disable-next-line
+      const user = {
+         id: getUuid(),
+         email: inputedEmail,
+         password: inputedPassword,
+         createdAt: Date.now(),
+      };
+      axios
+         .post("/api/v1/users", user)
+         .then((res) => {
+            console.log(res.data);
+            this.props.dispatch({
+               type: actions.UPDATE_CURRENT_USER,
+               payload: res.data,
             });
-         //this.logInCurrentUser();
-         //this.props.history.push("/create-answer");
-      }
+            this.props.history.push("/create-answer");
+         })
+         .catch((err) => {
+            const { data } = err.response;
+            console.log(data);
+            const { emailError, passwordError } = data;
+            if (emailError !== "") {
+               this.setState({
+                  creatEmailHasError: true,
+                  createEmailError: emailError,
+               });
+            } else {
+               this.setState({
+                  creatEmailHasError: false,
+                  createEmailError: emailError,
+               });
+            }
+            if (passwordError !== "") {
+               this.setState({
+                  createPasswordHasError: true,
+                  createPasswordError: passwordError,
+               });
+            } else {
+               this.setState({
+                  createPasswordHasError: false,
+                  createPasswordError: passwordError,
+               });
+            }
+         });
    }
 
    render() {

@@ -1,11 +1,11 @@
 module.exports = function getSignUpPasswordError(password, email) {
-   const localPartEmail = email.split("@")[0];
    if (password === "") {
       return "Please create a password.";
    }
    if (password.length < 9) {
       return "Your password must be at least 9 characters";
    }
+   const localPartEmail = email.split("@")[0];
    if (password === localPartEmail) {
       return "Password cannot contain email.";
    }
