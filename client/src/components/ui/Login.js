@@ -1,7 +1,5 @@
 import React from "react";
 import classnames from "classnames";
-import { v4 as getUuid } from "uuid";
-import { EMAIL_REGEX } from "../../utils/helpers";
 import axios from "axios";
 import { connect } from "react-redux";
 import actions from "../../store/actions";
@@ -12,56 +10,10 @@ class Login extends React.Component {
       super();
       this.state = {
          emailErrorMessage: "",
-         emailIsntValid: "",
-         PasswordFieldIsBlank: false,
+         emailIsntValid: false,
+         passwordHasError: false,
+         passwordErrorMessage: "",
       };
-   }
-
-   logInCurrentUser() {
-      axios
-         .get(
-            "https://raw.githubusercontent.com/Alangsam/white-bear-mpa/master/src/mock-data/user.json"
-         )
-         .then((res) => {
-            // handle success
-            console.log(res.data);
-            const currentUser = res.data;
-            this.props.dispatch({
-               type: actions.UPDATE_CURRENT_USER,
-               payload: currentUser,
-            });
-         })
-         .catch((error) => {
-            // handle error
-            console.log(error);
-         });
-   }
-
-   checkIfCredentialsEntered() {
-      const inputedEmail = document.getElementById("Email_textbox_bottom")
-         .value;
-      const inputedPassword = document.getElementById("Email_password_bottom")
-         .value;
-      if (inputedEmail === "") {
-         this.setState({
-            emailIsntValid: true,
-            emailErrorMessage: "Please enter your email",
-         });
-      } else if (
-         EMAIL_REGEX.test(String(inputedEmail).toLowerCase()) === false
-      ) {
-         this.setState({
-            emailIsntValid: true,
-            emailErrorMessage: "Please enter a valid email",
-         });
-      } else {
-         this.setState({ emailIsntValid: false, emailErrorMessage: "" });
-      }
-      if (inputedPassword === "") {
-         this.setState({ PasswordFieldIsBlank: true });
-      } else {
-         this.setState({ PasswordFieldIsBlank: false });
-      }
    }
 
    logUserObject() {
@@ -69,20 +21,48 @@ class Login extends React.Component {
          .value;
       const inputedPassword = document.getElementById("Email_password_bottom")
          .value;
-      if (
-         this.state.emailIsntValid === false &&
-         this.state.PasswordFieldIsBlank === false
-      ) {
-         const user = {
-            id: getUuid(),
-            email: inputedEmail,
-            password: inputedPassword,
-            createdAt: Date.now(),
-         };
-         console.log(user);
-         this.logInCurrentUser();
-         this.props.history.push("/create-answer");
-      }
+
+      const user = {
+         email: inputedEmail,
+         password: inputedPassword,
+      };
+      axios
+         .post("/api/v1/users/auth", user)
+         .then((res) => {
+            // handle success
+            this.props.dispatch({
+               type: actions.UPDATE_CURRENT_USER,
+               payload: res.data,
+            });
+            this.props.history.push("/create-answer");
+         })
+         .catch((err) => {
+            const { data } = err.response;
+            console.log(data);
+            const { emailError, passwordError } = data;
+            if (emailError !== "") {
+               this.setState({
+                  emailIsntValid: true,
+                  emailErrorMessage: emailError,
+               });
+            } else {
+               this.setState({
+                  emailIsntValid: false,
+                  emailErrorMessage: emailError,
+               });
+            }
+            if (passwordError !== "") {
+               this.setState({
+                  passwordHasError: true,
+                  passwordErrorMessage: passwordError,
+               });
+            } else {
+               this.setState({
+                  passwordHasError: false,
+                  passwordErrorMessage: passwordError,
+               });
+            }
+         });
    }
 
    render() {
@@ -103,19 +83,17 @@ class Login extends React.Component {
                            id="Email_textbox_bottom"
                            className={classnames({
                               "form-control": true,
-                              "is-invalid": this.state.emailIsntValid,
+                              //"is-invalid": this.state.emailIsntValid,
                            })}
                            type="email"
                            name="login_info"
-                           onChange={() => {
-                              this.checkIfCredentialsEntered();
-                           }}
                         ></input>
-                        {this.state.emailIsntValid && (
+                        {this.state.emailIsntValid === true && (
                            <div
                               htmlFor="Email_textbox_bottom"
                               id="you-need-to-enter-email"
                               className="text-danger"
+                              key={4}
                            >
                               {this.state.emailErrorMessage}
                            </div>
@@ -127,15 +105,12 @@ class Login extends React.Component {
                            id="Email_password_bottom"
                            className={classnames({
                               "form-control": true,
-                              "is-invalid": this.state.PasswordFieldIsBlank,
+                              //"is-invalid": this.state.PasswordFieldIsBlank,
                            })}
                            type="password"
                            name="login_info"
-                           onChange={() => {
-                              this.checkIfCredentialsEntered();
-                           }}
                         ></input>
-                        {this.state.PasswordFieldIsBlank && (
+                        {this.state.passwordHasError && (
                            <div
                               htmlFor="Email_password_bottom"
                               id="you-need-to-enter-something"
@@ -147,10 +122,8 @@ class Login extends React.Component {
                      </div>
                   </form>
                   <button
-                     to="/create-answer"
                      className="btn btn-success float-right mt-4"
                      onClick={() => {
-                        this.checkIfCredentialsEntered();
                         this.logUserObject();
                      }}
                   >

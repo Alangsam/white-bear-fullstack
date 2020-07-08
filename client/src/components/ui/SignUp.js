@@ -36,7 +36,6 @@ class SignUp extends React.Component {
       axios
          .post("/api/v1/users", user)
          .then((res) => {
-            console.log(res.data);
             this.props.dispatch({
                type: actions.UPDATE_CURRENT_USER,
                payload: res.data,
