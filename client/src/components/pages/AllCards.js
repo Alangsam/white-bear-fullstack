@@ -3,7 +3,6 @@ import AppTemplate from "../ui/AppTemplate";
 import MemoryCard from "../ui/MemoryCard";
 import axios from "axios";
 import { connect } from "react-redux";
-const userId = "42160c3e-7a5b-4fb9-b361-ac9598aca4e2";
 
 class AllCards extends React.Component {
    constructor() {
@@ -36,7 +35,7 @@ class AllCards extends React.Component {
    setMemoryCards() {
       axios
          .get(
-            `/api/v1/memory-cards?userId=${userId}&searchTerm=${this.state.searchTerm}&order=${this.state.order}`
+            `/api/v1/memory-cards?searchTerm=${this.state.searchTerm}&order=${this.state.order}`
          )
          .then((res) => {
             // handle success
