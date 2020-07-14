@@ -4,6 +4,7 @@ import axios from "axios";
 import { connect } from "react-redux";
 import actions from "../../store/actions";
 import { withRouter } from "react-router-dom";
+import jwtDecode from "jwt-decode";
 
 class Login extends React.Component {
    constructor() {
@@ -30,9 +31,12 @@ class Login extends React.Component {
          .post("/api/v1/users/auth", user)
          .then((res) => {
             // handle success
+            const authToken = res.data;
+            localStorage.setItem("authToken", authToken);
+            const user = jwtDecode(authToken);
             this.props.dispatch({
                type: actions.UPDATE_CURRENT_USER,
-               payload: res.data,
+               payload: user,
             });
             this.props.history.push("/create-answer");
          })
